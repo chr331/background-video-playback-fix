@@ -25,9 +25,6 @@ Force video and audio to keep playing in the background. Prevent websites from p
 安装后刷新目标网站即可生效。  
 After installing, refresh the target website.
 
-## Search Keywords / 搜索关键词
-
-Tampermonkey, Violentmonkey, userscript, background playback, background video playback, HTML5 video background playback, prevent video pause on tab switch, keep video playing in background, prevent media pause on blur, visibilitychange pause blocker, pagehide pause blocker, freeze event pause blocker, picture-in-picture background, YouTube background play userscript, youtube background video play, bilibili 后台播放, 视频后台播放油猴脚本, 网页视频切标签暂停, 切换标签页不暂停, 页面隐藏不暂停, 网页视频不暂停, 网页后台防暂停脚本。
 
 <a id="zh"></a>
 
