@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Background Media Playback Keepalive</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --blue: #1677ff;
+        --blue-dark: #0958d9;
+        --ink: #1f2937;
+        --muted: #667085;
+        --line: #d9e2ef;
+        --panel: #f7fafc;
+        --code: #111827;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.65;
+      }
+
+      a {
+        color: var(--blue-dark);
+      }
+
+      .top {
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+      }
+
+      .wrap {
+        width: min(1040px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      header {
+        padding: 48px 0 34px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--blue-dark);
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 900px;
+        margin: 0;
+        color: #111827;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .intro {
+        max-width: 760px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border: 1px solid var(--blue);
+        border-radius: 8px;
+        background: var(--blue);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(22, 119, 255, 0.18);
+      }
+
+      .btn:hover,
+      .btn:focus {
+        background: var(--blue-dark);
+        border-color: var(--blue-dark);
+      }
+
+      .btn.secondary {
+        background: #ffffff;
+        color: var(--blue-dark);
+        box-shadow: none;
+      }
+
+      main {
+        padding: 36px 0 64px;
+      }
+
+      section {
+        padding: 34px 0;
+        border-bottom: 1px solid var(--line);
+        scroll-margin-top: 20px;
+      }
+
+      section:last-child {
+        border-bottom: 0;
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        color: #111827;
+        font-size: 30px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        margin: 26px 0 8px;
+        color: #111827;
+        font-size: 20px;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+
+      ul,
+      ol {
+        padding-left: 24px;
+      }
+
+      code {
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: #eef4ff;
+        color: var(--code);
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.94em;
+      }
+
+      pre {
+        overflow: auto;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      pre code {
+        padding: 0;
+        background: transparent;
+      }
+
+      .note {
+        margin-top: 22px;
+        padding: 16px;
+        border-left: 4px solid var(--blue);
+        background: var(--panel);
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          width: min(100% - 28px, 1040px);
+        }
+
+        header {
+          padding-top: 34px;
+        }
+
+        h1 {
+          font-size: 34px;
+        }
+
+        .intro {
+          font-size: 16px;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <header class="wrap">
+        <p class="eyebrow">Userscript</p>
+        <h1>Background Media Playback Keepalive</h1>
+        <p class="intro">A general userscript for keeping media alive when websites pause playback after tab switching, page hiding, window blur, or freeze events.</p>
+        <nav class="actions" aria-label="Language navigation">
+          <a class="btn" href="#zh">中文说明</a>
+          <a class="btn" href="#en">English Guide</a>
+          <a class="btn secondary" href="https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js">Install Script</a>
+        </nav>
+      </header>
+    </div>
+
+    <main class="wrap">
+      <section id="zh" lang="zh-CN">
+        <h2>中文说明</h2>
+        <p>这是一个通用 Tampermonkey / Violentmonkey 用户脚本，用来尽量阻止网页在切换标签页、窗口失焦、页面隐藏或页面冻结时强制暂停正在播放的视频和音频。</p>
+
+        <h3>为什么会暂停</h3>
+        <p>不少网站会在播放器脚本中监听 <code>blur</code>、<code>visibilitychange</code>、<code>pagehide</code>、<code>freeze</code> 等事件，然后主动调用 <code>video.pause()</code> 或 <code>audio.pause()</code>。</p>
+
+        <h3>脚本怎么处理</h3>
+        <p>脚本会在 <code>document-start</code> 尽早注入，包装后台相关事件处理器。在媒体正在播放或刚播放过时，它会临时把页面报告为可见状态，并拦截由后台事件触发的暂停调用。</p>
+
+        <h3>安装</h3>
+        <ol>
+          <li>安装 Tampermonkey 或 Violentmonkey。</li>
+          <li>打开 <a href="https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js">background-media-playback-keepalive.user.js</a>。</li>
+          <li>在脚本管理器中确认安装。</li>
+          <li>刷新需要后台播放的网站。</li>
+        </ol>
+
+        <h3>限制</h3>
+        <p>它不能绕过 DRM、付费权限、浏览器自动播放规则、网络限制或服务端限制。如果某个页面依赖真实可见性状态完成正常逻辑，启用脚本后可能影响该页面行为。</p>
+
+        <div class="note">
+          <strong>调试：</strong>在控制台运行 <code>window.__backgroundMediaPlaybackKeepalive</code>，可以查看已拦截的事件和暂停次数。
+        </div>
+      </section>
+
+      <section id="en" lang="en">
+        <h2>English Guide</h2>
+        <p>This is a general Tampermonkey / Violentmonkey userscript that tries to keep video and audio playing when websites force playback to pause after tab switching, window blur, page hiding, or page freeze events.</p>
+
+        <h3>Why playback stops</h3>
+        <p>Many sites listen for <code>blur</code>, <code>visibilitychange</code>, <code>pagehide</code>, and <code>freeze</code> inside their player code, then actively call <code>video.pause()</code> or <code>audio.pause()</code>.</p>
+
+        <h3>How the script works</h3>
+        <p>The script injects at <code>document-start</code>, wraps background-related event handlers, temporarily reports the page as visible while media is active or recently active, and blocks pause calls triggered near those background events.</p>
+
+        <h3>Install</h3>
+        <ol>
+          <li>Install Tampermonkey or Violentmonkey.</li>
+          <li>Open <a href="https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js">background-media-playback-keepalive.user.js</a>.</li>
+          <li>Confirm installation in your userscript manager.</li>
+          <li>Refresh the site where you want background playback.</li>
+        </ol>
+
+        <h3>Limits</h3>
+        <p>It does not bypass DRM, paid access, browser autoplay rules, network limits, or server-side restrictions. On pages that require real visibility state for normal behavior, the script may change behavior while media is active.</p>
+
+        <div class="note">
+          <strong>Debug:</strong> run <code>window.__backgroundMediaPlaybackKeepalive</code> in the console to inspect blocked events and pause calls.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
