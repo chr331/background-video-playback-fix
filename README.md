@@ -1,8 +1,8 @@
 # Background Media Playback Keepalive
 
 <p align="center">
-  <a href="#中文说明"><img alt="中文说明" src="https://img.shields.io/badge/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E-1677ff?style=for-the-badge"></a>
-  <a href="#english-guide"><img alt="English Guide" src="https://img.shields.io/badge/English_Guide-1677ff?style=for-the-badge"></a>
+  <a href="#zh"><img alt="中文说明" src="https://img.shields.io/badge/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E-1677ff?style=for-the-badge"></a>
+  <a href="#en"><img alt="English Guide" src="https://img.shields.io/badge/English_Guide-1677ff?style=for-the-badge"></a>
 </p>
 
 <p align="center">
@@ -10,6 +10,8 @@
   ·
   <a href="https://chr331.github.io/background-media-playback-keepalive/">Open guide page</a>
 </p>
+
+<a id="zh"></a>
 
 ## 中文说明
 
@@ -50,6 +52,8 @@ window.__backgroundMediaPlaybackKeepalive
 ```
 
 可以查看脚本是否安装、拦截了多少后台事件，以及阻止了多少次后台触发的暂停。
+
+<a id="en"></a>
 
 ## English Guide
 
