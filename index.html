@@ -300,7 +300,10 @@
         <p>不少网站会在播放器脚本中监听 <code>blur</code>、<code>visibilitychange</code>、<code>pagehide</code>、<code>freeze</code> 等事件，然后主动调用 <code>video.pause()</code> 或 <code>audio.pause()</code>。</p>
 
         <h3>脚本怎么处理</h3>
-        <p>脚本会在 <code>document-start</code> 尽早注入，包装后台相关事件处理器。在媒体正在播放或刚播放过时，它会临时把页面报告为可见状态，并拦截由后台事件触发的暂停调用。</p>
+        <p>脚本会在 <code>document-start</code> 尽早注入，观察后台相关事件但不阻断页面自己的事件监听器。在媒体正在播放或刚播放过时，它会临时把页面报告为可见状态，并且只拦截由后台事件触发的媒体暂停调用。</p>
+
+        <h3>直播弹幕兼容</h3>
+        <p>从 <code>0.2.1</code> 起，脚本不再吞掉 <code>visibilitychange</code>、<code>blur</code> 等页面事件。斗鱼、B 站直播等网站的弹幕、直播聊天和播放器 UI 仍然可以正常收到事件。</p>
 
         <h3>安装</h3>
         <ol>
@@ -317,7 +320,7 @@
         <p>它不能绕过 DRM、付费权限、浏览器自动播放规则、网络限制或服务端限制。如果某个页面依赖真实可见性状态完成正常逻辑，启用脚本后可能影响该页面行为。</p>
 
         <div class="note">
-          <strong>调试：</strong>在控制台运行 <code>window.__backgroundMediaPlaybackKeepalive</code>，可以查看已拦截的事件和暂停次数。
+          <strong>调试：</strong>在控制台运行 <code>window.__backgroundMediaPlaybackKeepalive</code>，可以查看已观察到的后台事件和已拦截的暂停次数。
         </div>
       </section>
 
@@ -329,7 +332,10 @@
         <p>Many sites listen for <code>blur</code>, <code>visibilitychange</code>, <code>pagehide</code>, and <code>freeze</code> inside their player code, then actively call <code>video.pause()</code> or <code>audio.pause()</code>.</p>
 
         <h3>How The Script Works</h3>
-        <p>The script injects at <code>document-start</code>, wraps background-related event handlers, temporarily reports the page as visible while media is active or recently active, and blocks pause calls triggered near those background events.</p>
+        <p>The script injects at <code>document-start</code>, observes background-related events without blocking the page's own listeners, temporarily reports the page as visible while media is active or recently active, and blocks only media pause calls triggered near those background events.</p>
+
+        <h3>Live Danmaku Compatibility</h3>
+        <p>Since <code>0.2.1</code>, the script no longer swallows <code>visibilitychange</code>, <code>blur</code>, or related page events. Danmaku overlays, live chat, and player UI on sites such as Douyu and Bilibili Live can still receive those events normally.</p>
 
         <h3>Install</h3>
         <ol>
@@ -346,7 +352,7 @@
         <p>It does not bypass DRM, paid access, browser autoplay rules, network limits, or server-side restrictions. On pages that require real visibility state for normal behavior, the script may change behavior while media is active.</p>
 
         <div class="note">
-          <strong>Debug:</strong> run <code>window.__backgroundMediaPlaybackKeepalive</code> in the console to inspect blocked events and pause calls.
+          <strong>Debug:</strong> run <code>window.__backgroundMediaPlaybackKeepalive</code> in the console to inspect observed background events and blocked pause calls.
         </div>
       </section>
     </main>
