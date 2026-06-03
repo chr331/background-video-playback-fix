@@ -1,15 +1,33 @@
-# Background Media Playback Keepalive
+# 后台媒体继续播放 / Background Media Playback Keepalive
+
+<p align="center">
+  <a href="https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js">
+    <img alt="立即安装 / Install Now" src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E5%AE%89%E8%A3%85-Install%20Now-00a152?style=for-the-badge&logo=tampermonkey&logoColor=white">
+  </a>
+</p>
 
 <p align="center">
   <a href="#zh"><img alt="中文说明" src="https://img.shields.io/badge/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E-1677ff?style=for-the-badge"></a>
   <a href="#en"><img alt="English Guide" src="https://img.shields.io/badge/English_Guide-1677ff?style=for-the-badge"></a>
+  <a href="https://chr331.github.io/background-media-playback-keepalive/"><img alt="Guide Page" src="https://img.shields.io/badge/Guide_Page-6f42c1?style=for-the-badge"></a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js">Install userscript</a>
-  ·
-  <a href="https://chr331.github.io/background-media-playback-keepalive/">Open guide page</a>
-</p>
+**中文名：后台媒体继续播放**  
+**English name: Background Media Playback Keepalive**
+
+让网页视频/音频在切换标签页、窗口失焦、页面隐藏或页面冻结后尽量继续播放。  
+Keep video and audio playing when websites pause playback after tab switching, window blur, page hiding, or page freeze events.
+
+## 立即安装 / Install Now
+
+[![立即安装 / Install Now](https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E5%AE%89%E8%A3%85%20%2F%20INSTALL%20NOW-00a152?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js)
+
+安装后刷新目标网站即可生效。  
+After installing, refresh the target website.
+
+## 搜索关键词 / Search Keywords
+
+油猴脚本, Tampermonkey, Violentmonkey, 后台播放, 视频后台播放, 音频后台播放, 切换标签页不暂停, 页面隐藏不暂停, 网页视频不暂停, visibilitychange, blur, pagehide, freeze, HTML5 video background playback, keep video playing in background, prevent video pause on tab switch, userscript background media playback.
 
 <a id="zh"></a>
 
@@ -31,7 +49,7 @@
 ### 安装
 
 1. 安装 Tampermonkey 或 Violentmonkey。
-2. 打开 [background-media-playback-keepalive.user.js](https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js)。
+2. 点击上方醒目的 **立即安装 / Install Now** 按钮，或打开 [background-media-playback-keepalive.user.js](https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js)。
 3. 在脚本管理器里确认安装。
 4. 刷新需要后台播放的网站。
 
@@ -73,7 +91,7 @@ When those events fire, the site actively calls `video.pause()` or `audio.pause(
 ### Install
 
 1. Install Tampermonkey or Violentmonkey.
-2. Open [background-media-playback-keepalive.user.js](https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js).
+2. Click the prominent **Install Now** button above, or open [background-media-playback-keepalive.user.js](https://github.com/chr331/background-media-playback-keepalive/raw/main/background-media-playback-keepalive.user.js).
 3. Confirm the installation in your userscript manager.
 4. Refresh the site where you want background playback.
 

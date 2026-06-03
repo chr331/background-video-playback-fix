@@ -1,8 +1,12 @@
 // ==UserScript==
-// @name         Background Media Playback Keepalive
-// @namespace    local.background-media-playback-keepalive
-// @version      0.1.0
-// @description  Keep audio/video playing when sites pause media on tab switch, blur, page visibility, or pagehide events.
+// @name         后台媒体继续播放 / Background Media Playback Keepalive
+// @name:zh-CN   后台媒体继续播放
+// @name:en      Background Media Playback Keepalive
+// @namespace    https://github.com/chr331/background-media-playback-keepalive
+// @version      0.1.1
+// @description  阻止网页在切换标签页、窗口失焦或 visibilitychange/pagehide 时暂停视频和音频。Keep media playing when sites pause on tab switch or page visibility changes.
+// @description:zh-CN  让视频/音频切换标签页也继续播放，拦截 blur、visibilitychange、pagehide、freeze 触发的后台暂停。
+// @description:en     Keep audio/video playing when sites pause media on tab switch, blur, page visibility, pagehide, or freeze events.
 // @author       Codex
 // @homepageURL  https://github.com/chr331/background-media-playback-keepalive
 // @supportURL   https://github.com/chr331/background-media-playback-keepalive/issues
@@ -32,7 +36,7 @@
 
     var state = win[KEY] || {};
     state.installed = true;
-    state.version = '0.1.0';
+    state.version = '0.1.1';
     state.disabled = false;
     state.lastPlayAt = 0;
     state.lastActiveMediaAt = 0;
