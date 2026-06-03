@@ -3,7 +3,7 @@
 // @name:zh-CN   网页后台防暂停脚本
 // @name:en      Background Video Playback Fix
 // @namespace    https://github.com/chr331/background-video-playback-fix
-// @version      0.2.0
+// @version      0.2.1
 // @description  Prevent video/audio pause on tab switch, window blur, visibilitychange, pagehide, or freeze. 切换标签页时保持网页视频/音频后台播放。
 // @description:zh-CN  视频后台播放油猴脚本：防止网页在切换标签页、窗口失焦、页面隐藏、visibilitychange、pagehide 或 freeze 时自动暂停。
 // @description:en     Keep video and audio playing in the background. Prevent websites from pausing HTML5 video during tab switching, blur, visibilitychange, pagehide, or freeze.
@@ -36,7 +36,7 @@
 
     var state = win[KEY] || {};
     state.installed = true;
-    state.version = '0.2.0';
+    state.version = '0.2.1';
     state.disabled = false;
     state.lastPlayAt = 0;
     state.lastActiveMediaAt = 0;
@@ -44,6 +44,7 @@
     state.lastBackgroundEvent = '';
     state.wrappedListeners = state.wrappedListeners || 0;
     state.blockedEvents = state.blockedEvents || 0;
+    state.observedEvents = state.observedEvents || 0;
     state.blockedPauses = state.blockedPauses || 0;
     state.debug = state.debug || [];
     win[KEY] = state;
@@ -270,22 +271,20 @@
     }
 
     var rawAddEventListener = eventTargetProto.addEventListener;
-    var rawRemoveEventListener = eventTargetProto.removeEventListener;
 
     function captureShield(event) {
       var eventName = String(event && event.type || '').toLowerCase();
       if (!backgroundEvents[eventName]) return;
       if (!shouldProtectFromBackgroundEvent()) return;
 
+      // Live danmaku/chat layers often depend on these events. Observe them,
+      // then block only the media pause calls they trigger.
       rememberBackgroundEvent(eventName);
-      state.blockedEvents += 1;
-      debug('blocked-event', {
+      state.observedEvents += 1;
+      debug('observed-event', {
         event: eventName,
         target: event.currentTarget === win ? 'window' : 'document'
       });
-
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-      else if (event.stopPropagation) event.stopPropagation();
     }
 
     try {
@@ -297,110 +296,6 @@
       rawAddEventListener.call(doc, 'mozvisibilitychange', captureShield, true);
       rawAddEventListener.call(doc, 'msvisibilitychange', captureShield, true);
     } catch (_) {}
-
-    if (!eventTargetProto[KEY]) {
-      var listenerIds = new WeakMap();
-      var targetIds = new WeakMap();
-      var nextListenerId = 1;
-      var nextTargetId = 1;
-      var wrappedListeners = new Map();
-
-      function getObjectId(map, object, prefix, nextIdRef) {
-        if (!map.has(object)) {
-          map.set(object, prefix + nextIdRef.value);
-          nextIdRef.value += 1;
-        }
-        return map.get(object);
-      }
-
-      function listenerKey(target, type, listener) {
-        if (!listener || (typeof listener !== 'function' && typeof listener !== 'object')) return '';
-        var listenerId = getObjectId(listenerIds, listener, 'l', { get value() { return nextListenerId; }, set value(v) { nextListenerId = v; } });
-        var targetId = getObjectId(targetIds, target, 't', { get value() { return nextTargetId; }, set value(v) { nextTargetId = v; } });
-        return String(type).toLowerCase() + '|' + targetId + '|' + listenerId;
-      }
-
-      function callListener(listener, self, event) {
-        if (typeof listener === 'function') return listener.call(self, event);
-        if (listener && typeof listener.handleEvent === 'function') return listener.handleEvent(event);
-        return undefined;
-      }
-
-      function wrapListener(target, type, listener) {
-        var eventName = String(type || '').toLowerCase();
-        if (!backgroundEvents[eventName]) return listener;
-        if (!listener || (typeof listener !== 'function' && typeof listener !== 'object')) return listener;
-
-        var key = listenerKey(target, eventName, listener);
-        if (wrappedListeners.has(key)) return wrappedListeners.get(key);
-
-        var wrapped = function (event) {
-          if (shouldProtectFromBackgroundEvent()) {
-            rememberBackgroundEvent(eventName);
-            state.blockedEvents += 1;
-            debug('blocked-listener', {
-              event: eventName,
-              target: target === win ? 'window' : target === doc ? 'document' : 'other'
-            });
-            if (event && event.stopImmediatePropagation) event.stopImmediatePropagation();
-            else if (event && event.stopPropagation) event.stopPropagation();
-            return undefined;
-          }
-          return callListener(listener, this, event);
-        };
-
-        wrappedListeners.set(key, wrapped);
-        state.wrappedListeners += 1;
-        return wrapped;
-      }
-
-      defineValue(eventTargetProto, 'addEventListener', function (type, listener, options) {
-        return rawAddEventListener.call(this, type, wrapListener(this, type, listener), options);
-      });
-
-      defineValue(eventTargetProto, 'removeEventListener', function (type, listener, options) {
-        var key = listenerKey(this, type, listener);
-        var wrapped = key && wrappedListeners.get(key);
-        return rawRemoveEventListener.call(this, type, wrapped || listener, options);
-      });
-
-      defineValue(eventTargetProto, KEY, true);
-    }
-
-    function protectHandlerProperty(target, prop, eventName) {
-      if (!target) return;
-      var stored = null;
-      try {
-        Object.defineProperty(target, prop, {
-          configurable: true,
-          get: function () {
-            return stored;
-          },
-          set: function (handler) {
-            if (typeof handler !== 'function') {
-              stored = handler;
-              return;
-            }
-            stored = function (event) {
-              if (shouldProtectFromBackgroundEvent()) {
-                rememberBackgroundEvent(eventName);
-                state.blockedEvents += 1;
-                debug('blocked-handler', { event: eventName, prop: prop });
-                if (event && event.stopImmediatePropagation) event.stopImmediatePropagation();
-                else if (event && event.stopPropagation) event.stopPropagation();
-                return undefined;
-              }
-              return handler.call(this, event);
-            };
-          }
-        });
-      } catch (_) {}
-    }
-
-    protectHandlerProperty(win, 'onblur', 'blur');
-    protectHandlerProperty(win, 'onpagehide', 'pagehide');
-    protectHandlerProperty(doc, 'onvisibilitychange', 'visibilitychange');
-    protectHandlerProperty(doc, 'onwebkitvisibilitychange', 'webkitvisibilitychange');
 
     debug('installed', {});
   }
