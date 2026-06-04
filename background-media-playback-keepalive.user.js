@@ -3,7 +3,7 @@
 // @name:zh-CN   网页后台防暂停脚本
 // @name:en      Background Video Playback Fix
 // @namespace    https://github.com/chr331/background-video-playback-fix
-// @version      0.2.1
+// @version      0.2.2
 // @description  Prevent video/audio pause on tab switch, window blur, visibilitychange, pagehide, or freeze. 切换标签页时保持网页视频/音频后台播放。
 // @description:zh-CN  视频后台播放油猴脚本：防止网页在切换标签页、窗口失焦、页面隐藏、visibilitychange、pagehide 或 freeze 时自动暂停。
 // @description:en     Keep video and audio playing in the background. Prevent websites from pausing HTML5 video during tab switching, blur, visibilitychange, pagehide, or freeze.
@@ -36,22 +36,26 @@
 
     var state = win[KEY] || {};
     state.installed = true;
-    state.version = '0.2.1';
+    state.version = '0.2.2';
     state.disabled = false;
     state.lastPlayAt = 0;
     state.lastActiveMediaAt = 0;
     state.lastBackgroundEventAt = 0;
     state.lastBackgroundEvent = '';
+    state.lastUserInteractionAt = 0;
+    state.lastUserInteraction = '';
     state.wrappedListeners = state.wrappedListeners || 0;
     state.blockedEvents = state.blockedEvents || 0;
     state.observedEvents = state.observedEvents || 0;
     state.blockedPauses = state.blockedPauses || 0;
+    state.allowedUserPauses = state.allowedUserPauses || 0;
     state.debug = state.debug || [];
     win[KEY] = state;
 
     var knownMedia = new Set();
     var BACKGROUND_EVENT_PAUSE_WINDOW_MS = 3000;
     var RECENT_PLAY_WINDOW_MS = 8000;
+    var USER_INTERACTION_PAUSE_WINDOW_MS = 1500;
     var DEBUG_LIMIT = 80;
     var nativeDocProps = {};
 
@@ -236,6 +240,10 @@
       return now() - state.lastBackgroundEventAt < BACKGROUND_EVENT_PAUSE_WINDOW_MS;
     }
 
+    function wasRecentUserInteraction() {
+      return now() - state.lastUserInteractionAt < USER_INTERACTION_PAUSE_WINDOW_MS;
+    }
+
     if (mediaProto && mediaProto.play && !mediaProto.play[KEY]) {
       var rawPlay = mediaProto.play;
       var patchedPlay = function () {
@@ -260,6 +268,14 @@
       var patchedPause = function () {
         knownMedia.add(this);
         if (shouldBlockPauseCall(this)) {
+          if (wasRecentUserInteraction()) {
+            state.allowedUserPauses += 1;
+            debug('allowed-user-pause', {
+              event: state.lastBackgroundEvent,
+              interaction: state.lastUserInteraction
+            });
+            return rawPause.apply(this, arguments);
+          }
           state.blockedPauses += 1;
           debug('blocked-pause', { event: state.lastBackgroundEvent });
           return undefined;
@@ -271,6 +287,26 @@
     }
 
     var rawAddEventListener = eventTargetProto.addEventListener;
+
+    function captureUserInteraction(event) {
+      if (!event || event.isTrusted !== true) return;
+
+      var eventName = String(event.type || '').toLowerCase();
+      if (eventName === 'keydown') {
+        var key = String(event.key || '').toLowerCase();
+        var isPauseKey = key === ' ' ||
+          key === 'spacebar' ||
+          key === 'enter' ||
+          key === 'k' ||
+          key === 'mediaplaypause' ||
+          key === 'mediapause';
+        if (!isPauseKey || event.ctrlKey || event.altKey || event.metaKey) return;
+        eventName += ':' + key;
+      }
+
+      state.lastUserInteractionAt = now();
+      state.lastUserInteraction = eventName;
+    }
 
     function captureShield(event) {
       var eventName = String(event && event.type || '').toLowerCase();
@@ -288,6 +324,14 @@
     }
 
     try {
+      rawAddEventListener.call(doc, 'pointerdown', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'pointerup', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'mousedown', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'mouseup', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'touchstart', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'touchend', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'click', captureUserInteraction, true);
+      rawAddEventListener.call(doc, 'keydown', captureUserInteraction, true);
       rawAddEventListener.call(win, 'blur', captureShield, true);
       rawAddEventListener.call(win, 'pagehide', captureShield, true);
       rawAddEventListener.call(win, 'freeze', captureShield, true);
