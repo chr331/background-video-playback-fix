@@ -61,6 +61,10 @@ Tampermonkey, Violentmonkey, userscript, background playback, background video p
 
 从 `0.2.1` 起，脚本不再包裹或吞掉 `visibilitychange`、`blur` 等页面事件。斗鱼、B 站直播等网站的弹幕、直播聊天、播放器 UI 仍然可以收到这些事件；脚本只会在这些事件之后拦截媒体自己的 `pause()` 调用。
 
+### 用户主动暂停兼容
+
+从 `0.2.2` 起，脚本会识别近期真实的鼠标、触摸和播放器快捷键操作。即使网站在拖动进度条或操作播放器时触发了 `blur`，用户随后主动点击暂停仍会被放行；没有用户操作的后台自动暂停仍会被阻止。
+
 ### 限制
 
 这个脚本不能绕过 DRM、付费权限、浏览器自动播放策略、网络限制或网站服务端限制。如果某个网站必须依赖真实的页面可见性状态完成业务逻辑，启用脚本后也可能影响该页面行为。
@@ -73,7 +77,7 @@ Tampermonkey, Violentmonkey, userscript, background playback, background video p
 window.__backgroundMediaPlaybackKeepalive
 ```
 
-可以查看脚本是否安装、观察到多少后台事件，以及阻止了多少次后台触发的暂停。
+可以查看脚本是否安装、观察到多少后台事件、阻止了多少次后台自动暂停，以及放行了多少次用户主动暂停。
 
 <a id="en"></a>
 
@@ -107,6 +111,10 @@ The script matches all `http://*/*` and `https://*/*` pages and also tries to co
 
 Since `0.2.1`, the script no longer wraps or swallows `visibilitychange`, `blur`, or related page events. Danmaku overlays, live chat, and player UI on live sites such as Douyu and Bilibili Live can still receive those events; the script only blocks media `pause()` calls that follow them.
 
+### Intentional Pause Compatibility
+
+Since `0.2.2`, the script recognizes recent trusted mouse, touch, and player-keyboard interactions. A user's pause request is allowed even if dragging the seek bar or operating player controls caused a `blur`; background pause calls without user interaction are still blocked.
+
 ### Limits
 
 This script does not bypass DRM, paid access, browser autoplay rules, network limits, or server-side restrictions. On sites that require real page visibility state for normal behavior, the script may change page behavior while media is active.
@@ -119,4 +127,4 @@ Run this in the browser console:
 window.__backgroundMediaPlaybackKeepalive
 ```
 
-It exposes install status, observed background events, and blocked pause calls.
+It exposes install status, observed background events, blocked pause calls, and user-requested pauses that were allowed.

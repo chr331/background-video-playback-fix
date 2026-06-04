@@ -305,6 +305,9 @@
         <h3>直播弹幕兼容</h3>
         <p>从 <code>0.2.1</code> 起，脚本不再吞掉 <code>visibilitychange</code>、<code>blur</code> 等页面事件。斗鱼、B 站直播等网站的弹幕、直播聊天和播放器 UI 仍然可以正常收到事件。</p>
 
+        <h3>用户主动暂停兼容</h3>
+        <p>从 <code>0.2.2</code> 起，脚本会识别近期真实的鼠标、触摸和播放器快捷键操作。拖动进度条或操作播放器触发 <code>blur</code> 后，用户主动点击暂停仍会被放行。</p>
+
         <h3>安装</h3>
         <ol>
           <li>安装 Tampermonkey 或 Violentmonkey。</li>
@@ -320,7 +323,7 @@
         <p>它不能绕过 DRM、付费权限、浏览器自动播放规则、网络限制或服务端限制。如果某个页面依赖真实可见性状态完成正常逻辑，启用脚本后可能影响该页面行为。</p>
 
         <div class="note">
-          <strong>调试：</strong>在控制台运行 <code>window.__backgroundMediaPlaybackKeepalive</code>，可以查看已观察到的后台事件和已拦截的暂停次数。
+          <strong>调试：</strong>在控制台运行 <code>window.__backgroundMediaPlaybackKeepalive</code>，可以查看已观察到的后台事件、已拦截的后台暂停和已放行的用户主动暂停次数。
         </div>
       </section>
 
@@ -337,6 +340,9 @@
         <h3>Live Danmaku Compatibility</h3>
         <p>Since <code>0.2.1</code>, the script no longer swallows <code>visibilitychange</code>, <code>blur</code>, or related page events. Danmaku overlays, live chat, and player UI on sites such as Douyu and Bilibili Live can still receive those events normally.</p>
 
+        <h3>Intentional Pause Compatibility</h3>
+        <p>Since <code>0.2.2</code>, recent trusted mouse, touch, and player-keyboard interactions allow intentional pause requests even if seeking or operating player controls caused a <code>blur</code>.</p>
+
         <h3>Install</h3>
         <ol>
           <li>Install Tampermonkey or Violentmonkey.</li>
@@ -352,7 +358,7 @@
         <p>It does not bypass DRM, paid access, browser autoplay rules, network limits, or server-side restrictions. On pages that require real visibility state for normal behavior, the script may change behavior while media is active.</p>
 
         <div class="note">
-          <strong>Debug:</strong> run <code>window.__backgroundMediaPlaybackKeepalive</code> in the console to inspect observed background events and blocked pause calls.
+          <strong>Debug:</strong> run <code>window.__backgroundMediaPlaybackKeepalive</code> in the console to inspect observed background events, blocked background pauses, and allowed user-requested pauses.
         </div>
       </section>
     </main>
